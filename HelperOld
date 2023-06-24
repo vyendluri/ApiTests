@@ -1,0 +1,58 @@
+public class ApiScenarioContext
+{
+    public HttpResponseMessage Response { get; set; }
+}
+
+[Binding]
+public class EmployeeApiSteps
+{
+    private readonly IApiHelper _api;
+    private readonly ApiScenarioContext _context;
+    private UserCredentials _credentials;
+    private Employee _employee;
+
+    public EmployeeApiSteps(IApiHelper api, ApiScenarioContext context)
+    {
+        _api = api;
+        _context = context;
+    }
+
+    // Existing steps...
+
+    [When("I send a GET request to the endpoint \"/employee/1\"")]
+    public async Task WhenISendAGETRequestToTheEndpoint()
+    {
+        _context.Response = await _api.GetAsync("employee/1");
+    }
+}
+
+[Binding]
+public class ApiResponseSteps
+{
+    private readonly ApiScenarioContext _context;
+
+    public ApiResponseSteps(ApiScenarioContext context)
+    {
+        _context = context;
+    }
+
+    [Then("the response status code should be 200")]
+    public void ThenTheResponseStatusCodeShouldBe200()
+    {
+        Assert.AreEqual(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then("the response status code should be 401")]
+    public void ThenTheResponseStatusCodeShouldBe401()
+    {
+        Assert.AreEqual(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then("the response status code should be 404")]
+    public void ThenTheResponseStatusCodeShouldBe404()
+    {
+        Assert.AreEqual(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+}
+
+services.AddScoped<ApiScenarioContext>();
