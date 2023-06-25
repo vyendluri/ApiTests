@@ -1,0 +1,3015 @@
+// employee/{employeeId}/employeeSettings
+
+Feature: Employee Settings API
+
+Scenario: Get employee settings with a valid employee ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "employee/{employeeId}/employeeSettings" API
+    Then I should receive a 200 OK status
+    And the response should match the expected employee settings
+
+Scenario: Get employee settings with an invalid employee ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "employee/{employeeId}/employeeSettings" API
+    Then I should receive a 404 Not Found status
+
+Scenario: Get employee settings without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "employee/{employeeId}/employeeSettings" API
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Update employee settings with a valid employee ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have the new settings to update
+    When I send a PUT request to the "employee/{employeeId}/employeeSettings" API with the new settings
+    Then I should receive a 200 OK status
+    And the response should match the updated employee settings
+
+Scenario: Update employee settings with an invalid employee ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have the new settings to update
+    When I send a PUT request to the "employee/{employeeId}/employeeSettings" API with the new settings
+    Then I should receive a 404 Not Found status
+
+Scenario: Update employee settings without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have the new settings to update
+    When I send a PUT request to the "employee/{employeeId}/employeeSettings" API with the new settings
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class EmployeeSettingsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public EmployeeSettingsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid bearer token")]
+    public void GivenIHaveAValidBearerToken()
+    {
+        _context.BearerToken = _apiHelper.GetBearerToken(_context.ApiConfig);
+    }
+
+    [Given(@"I do not have a bearer token")]
+    public void GivenIDoNotHaveABearerToken()
+    {
+        _context.BearerToken = null;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [When(@"I send a GET request to the ""employee/{employeeId}/employeeSettings"" API")]
+    public async Task WhenISendAGETRequestToTheEmployeeEmployeeSettingsAPI()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/employee/{_employeeId}/employeeSettings";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [When(@"I send a PUT request to the ""employee/{employeeId}/employeeSettings"" API with the new settings")]
+    public async Task WhenISendAPUTRequestToTheEmployeeEmployeeSettingsAPIWithTheNewSettings()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/employee/{_employeeId}/employeeSettings";
+        var newSettings = new EmployeeSettings(); // Replace with the actual new settings
+        _context.Response = await _apiHelper.PutAsync(url, newSettings, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    // Additional steps to verify the response content would go here
+}
+
+-----------------------------------------------------------------------------------------------------------------
+// GetPayeForms
+
+Feature: Get PAYE Forms API
+
+Scenario: Get PAYE forms for a valid employee ID and valid page parameters
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 200 OK status
+    And the response should match the expected PAYE forms
+
+Scenario: Get PAYE forms for a valid employee ID and invalid page parameters
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have invalid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 400 Bad Request status
+
+Scenario: Get PAYE forms for an invalid employee ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 404 Not Found status
+
+Scenario: Get PAYE forms without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get PAYE forms with a page size exceeding the maximum allowed size
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have page parameters with a page size exceeding the maximum allowed size
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 400 Bad Request status
+
+Scenario: Get PAYE forms with a page number exceeding the maximum number of pages
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have page parameters with a page number exceeding the maximum number of pages
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 400 Bad Request status
+
+[Binding]
+public class GetPayeFormsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private PageParameters _pageParameters;
+
+    public GetPayeFormsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid bearer token")]
+    public void GivenIHaveAValidBearerToken()
+    {
+        _context.BearerToken = _apiHelper.GetBearerToken(_context.ApiConfig);
+    }
+
+    [Given(@"I do not have a bearer token")]
+    public void GivenIDoNotHaveABearerToken()
+    {
+        _context.BearerToken = null;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have valid page parameters")]
+    public void GivenIHaveValidPageParameters()
+    {
+        _pageParameters = new PageParameters
+        {
+            PageSize = 10,  // Replace with your valid values
+            PageNumber = 1, // Replace with your valid values
+            MaxPages = 5    // Replace with your valid values
+        };
+    }
+
+    [Given(@"I have invalid page parameters")]
+    public void GivenIHaveInvalidPageParameters()
+    {
+        _pageParameters = new PageParameters
+        {
+            PageSize = 0,   // Replace with your invalid values
+            PageNumber = -1, // Replace with your invalid values
+            MaxPages = 0     // Replace with your invalid values
+        };
+    }
+
+    [Given(@"I have page parameters with a page size exceeding the maximum allowed size")]
+    public void GivenIHavePageParametersWithAPageSizeExceedingTheMaximumAllowedSize()
+    {
+        _pageParameters = new PageParameters
+        {
+            PageSize = 10000,  // Replace with your value exceeding the limit
+            PageNumber = 1,
+            MaxPages = 5
+        };
+    }
+
+    [Given(@"I have page parameters with a page number exceeding the maximum number of pages")]
+    public void GivenIHavePageParametersWithAPageNumberExceedingTheMaximumNumberOfPages()
+    {
+        _pageParameters = new PageParameters
+        {
+            PageSize = 10,
+            PageNumber = 10000, // Replace with your value exceeding the limit
+            MaxPages = 5
+        };
+    }
+
+    [When(@"I send a GET request to the ""GetPayeForms"" API with the employee ID and page parameters")]
+    public async Task WhenISendAGETRequestToTheGetPayeFormsAPIWithTheEmployeeIDAndPageParameters()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayeForms?employeeId={_employeeId}&pageSize={_pageParameters.PageSize}&pageNumber={_pageParameters.PageNumber}&maxPages={_page
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayeForms?employeeId={_employeeId}&pageSize={_pageParameters.PageSize}&pageNumber={_pageParameters.PageNumber}&maxPages={_pageParameters.MaxPages}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 400 Bad Request status")]
+    public void ThenIShouldReceiveABadRequestStatus()
+    {
+        Assert.Equal(HttpStatusCode.BadRequest, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected PAYE forms")]
+    public void ThenTheResponseShouldMatchTheExpectedPAYEForms()
+    {
+        // You would need to implement this method based on how you expect to compare the actual and expected PAYE forms
+    }
+}
+
+
+--------------------------------------------------------------------------------------------
+// GetPayslipLatest
+
+Feature: Get Latest Payslip API
+
+Scenario: Get the latest payslip for a valid employee ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected latest payslip
+
+Scenario: Get the latest payslip for an invalid employee ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Get the latest payslip without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get the latest payslip for an employee ID with no payslip history
+    Given I have a valid bearer token
+    And I have an employee ID with no payslip history
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 204 No Content status
+
+
+[Binding]
+public class GetPayslipLatestSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public GetPayslipLatestSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID with no payslip history")]
+    public void GivenIHaveAnEmployeeIDWithNoPayslipHistory()
+    {
+        _employeeId = "NoPayslipHistoryEmployeeId"; // Replace with an employee ID that has no payslip history
+    }
+
+    [When(@"I send a GET request to the ""GetPayslipLatest"" API with the employee ID")]
+    public async Task WhenISendAGETRequestToTheGetPayslipLatestAPIWithTheEmployeeID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayslipLatest?employeeId={_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 204 No Content status")]
+    public void ThenIShouldReceiveANoContentStatus()
+    {
+        Assert.Equal(HttpStatusCode.NoContent, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected latest payslip")]
+    public void ThenTheResponseShouldMatchTheExpectedLatestPayslip()
+    {
+        // You would need to implement this method based on how you expect to compare the actual and expected payslip
+    }
+}
+
+------------------------------------------------------------------------------------------
+// GetPayslip
+Feature: Get Payslip API
+
+Scenario: Get payslips for a valid employee ID with valid page parameters and isAllPayslips is false
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    And isAllPayslips is set to false
+    When I send a GET request to the "GetPayslip" API with the employee ID, page parameters, and isAllPayslips
+    Then I should receive a 200 OK status
+    And the response should match the expected payslips
+
+Scenario: Get payslips for a valid employee ID with valid page parameters and isAllPayslips is true
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    And isAllPayslips is set to true
+    When I send a GET request to the "GetPayslip" API with the employee ID, page parameters, and isAllPayslips
+    Then I should receive a 200 OK status
+    And the response should match the expected payslips
+
+Scenario: Get payslips for an invalid employee ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have valid page parameters
+    And isAllPayslips is set to false
+    When I send a GET request to the "GetPayslip" API with the employee ID, page parameters, and isAllPayslips
+    Then I should receive a 404 Not Found status
+
+Scenario: Get payslips without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    And isAllPayslips is set to false
+    When I send a GET request to the "GetPayslip" API with the employee ID, page parameters, and isAllPayslips
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get payslips for an employee ID with invalid page parameters
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have invalid page parameters
+    And isAllPayslips is set to false
+    When I send a GET request to the "GetPayslip" API with the employee ID, page parameters, and isAllPayslips
+    Then I should receive a 400 Bad Request status
+
+
+[Binding]
+public class GetPayslipSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private PageParameters _pageParameters;
+    private bool _isAllPayslips;
+
+    public GetPayslipSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have valid page parameters")]
+    public void GivenIHaveValidPageParameters()
+    {
+        _pageParameters = new PageParameters() { MaxPageSize = 10, PageSize = 5, PageNumber = 1 }; // Replace with actual valid parameters
+    }
+
+    [Given(@"I have invalid page parameters")]
+    public void GivenIHaveInvalidPageParameters()
+    {
+        _pageParameters = new PageParameters() { MaxPageSize = 1000, PageSize = 500, PageNumber = -1 }; // Replace with invalid parameters
+    }
+
+    [Given(@"isAllPayslips is set to (.*)")]
+    public void GivenIsAllPayslipsIsSetTo(bool isAllPayslips)
+    {
+        _isAllPayslips = isAllPayslips;
+    }
+
+    [When(@"I send a GET request to the ""GetPayslip"" API with the employee ID, page parameters, and isAllPayslips")]
+    public async Task WhenISendAGETRequestToTheGetPayslipAPIWithTheEmployeeIDPageParametersAndIsAllPayslips()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayslip?employeeId={_employeeId}&pageSize={_pageParameters.PageSize}&pageNumber={_pageParameters.PageNumber}&maxPages={_pageParameters.MaxPageSize}&isAllPayslips={_isAllPayslips}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 400 Bad Request status")]
+    public void ThenIShouldReceiveABadRequestStatus()
+    {
+        Assert.Equal(HttpStatusCode.BadRequest, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected payslips")]
+    public void ThenTheResponseShouldMatchTheExpectedPayslips()
+    {
+        // Deserialize the response content to a list of Payslip objects (or whatever type of object your API returns)
+        var actualPayslips = JsonConvert.DeserializeObject<List<Payslip>>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected payslips from a file, a database, or hard-code them in your tests
+        var expectedPayslips = LoadExpectedPayslips(); // Replace this with a method to load the expected payslips
+
+        // Compare the actual and expected payslips
+        Assert.Equal(expectedPayslips, actualPayslips);
+    }
+}
+
+---------------------------------------------------------------------------
+// Get(int employeeId)
+
+Feature: Get Employee API
+
+Scenario: Get details of an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetEmployee" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected employee details
+
+Scenario: Try to get details of an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "GetEmployee" API with the employee ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get details of an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetEmployee" API with the employee ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get details of an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    When I send a GET request to the "GetEmployee" API with the employee ID
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetEmployeeSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public GetEmployeeSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [When(@"I send a GET request to the ""GetEmployee"" API with the employee ID")]
+    public async Task WhenISendAGETRequestToTheGetEmployeeAPIWithTheEmployeeID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/Get/{_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected employee details")]
+    public void ThenTheResponseShouldMatchTheExpectedEmployeeDetails()
+    {
+        // Deserialize the response content to an Employee object (or whatever type of object your API returns)
+        var actualEmployee = JsonConvert.DeserializeObject<Employee>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected employee details from a file, a database, or hard-code them in your tests
+        var expectedEmployee = LoadExpectedEmployee(); // Replace this with a method to load the expected employee
+
+        // Compare the actual and expected employee details
+        Assert.Equal(expectedEmployee, actualEmployee);
+    }
+}
+
+----------------------------------
+// GetEmployerSettings(int employeeId)
+
+Feature: Get Employer Settings API
+
+Scenario: Get employer settings for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetEmployerSettings" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected employer settings
+
+Scenario: Try to get employer settings for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "GetEmployerSettings" API with the employee ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get employer settings for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetEmployerSettings" API with the employee ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get employer settings for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    When I send a GET request to the "GetEmployerSettings" API with the employee ID
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetEmployerSettingsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public GetEmployerSettingsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [When(@"I send a GET request to the ""GetEmployerSettings"" API with the employee ID")]
+    public async Task WhenISendAGETRequestToTheGetEmployerSettingsAPIWithTheEmployeeID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetEmployerSettings/{_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected employer settings")]
+    public void ThenTheResponseShouldMatchTheExpectedEmployerSettings()
+    {
+        // Deserialize the response content to an EmployerSettings object (or whatever type of object your API returns)
+        var actualEmployerSettings = JsonConvert.DeserializeObject<EmployerSettings>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected employer settings from a file, a database, or hard-code them in your tests
+        var expectedEmployerSettings = LoadExpectedEmployerSettings(); // Replace this with a method to load the expected employer settings
+
+        // Compare the actual and expected employer settings
+        Assert.Equal(expectedEmployerSettings, actualEmployerSettings);
+    }
+}
+
+----------------------------------------------------------
+// GetPayeForms(int employeeId, [FromQuery] PageParameters pageParameters)
+
+Feature: Get PAYE Forms API
+
+Scenario: Get PAYE forms for an employee with a valid ID and valid page parameters
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 200 OK status
+    And the response should match the expected PAYE forms
+
+Scenario: Try to get PAYE forms for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get PAYE forms for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Try to get PAYE forms with invalid page parameters
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have invalid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 400 Bad Request status
+
+Scenario: Get PAYE forms for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    And I have valid page parameters
+    When I send a GET request to the "GetPayeForms" API with the employee ID and page parameters
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetPayeFormsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private PageParameters _pageParameters;
+
+    public GetPayeFormsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [Given(@"I have valid page parameters")]
+    public void GivenIHaveValidPageParameters()
+    {
+        _pageParameters = new PageParameters { PageSize = 10, PageNumber = 1 }; // Replace with valid page parameters
+    }
+
+    [Given(@"I have invalid page parameters")]
+    public void GivenIHaveInvalidPageParameters()
+    {
+        _pageParameters = new PageParameters { PageSize = -1, PageNumber = -1 }; // Replace with invalid page parameters
+    }
+
+    [When(@"I send a GET request to the ""GetPayeForms"" API with the employee ID and page parameters")]
+    public async Task WhenISendAGETRequestToTheGetPayeFormsAPIWithTheEmployeeIDAndPageParameters()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayeForms/{_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken, _pageParameters);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 400 Bad Request status")]
+    public void ThenIShouldReceiveABadRequestStatus()
+    {
+        Assert.Equal(HttpStatusCode.BadRequest, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected PAYE forms")]
+    public void ThenTheResponseShouldMatchTheExpectedPayeForms()
+    {
+        // Deserialize the response content to a list of PAYE forms (or whatever type of object your API returns)
+        var actualPayeForms = JsonConvert.DeserializeObject<List<PayeForm>>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected PAYE forms from a file, a database, or hard-code them in your tests
+        var expectedPayeForms
+
+-----------------------
+//GetPayslipLatest(int employeeId)
+Feature: Get Latest Payslip API
+
+Scenario: Get latest payslip for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected latest payslip
+
+Scenario: Try to get latest payslip for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get latest payslip for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get latest payslip for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    When I send a GET request to the "GetPayslipLatest" API with the employee ID
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetLatestPayslipSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public GetLatestPayslipSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [When(@"I send a GET request to the ""GetPayslipLatest"" API with the employee ID")]
+    public async Task WhenISendAGETRequestToTheGetPayslipLatestAPIWithTheEmployeeID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayslipLatest/{_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected latest payslip")]
+    public void ThenTheResponseShouldMatchTheExpectedLatestPayslip()
+    {
+        // Deserialize the response content to a payslip object
+        var actualPayslip = JsonConvert.DeserializeObject<Payslip>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected payslip from a file, a database, or hard-code it in your tests
+        var expectedPayslip = ...
+
+        // Compare the actual and expected payslip
+        Assert.Equal(expectedPayslip, actualPayslip);
+    }
+}
+
+-----------------------------------------------------------------------------
+// GetPayslips(int employeeId,[FromQuery] PageParameters pageParameters, bool isAllPayslips = false)
+
+Feature: Get Payslips API
+
+Scenario: Get specific number of payslips for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslips" API with the employee ID and page parameters
+    Then I should receive a 200 OK status
+    And the response should match the expected payslips
+
+Scenario: Get all payslips for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I want to get all payslips
+    When I send a GET request to the "GetPayslips" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected payslips
+
+Scenario: Try to get payslips for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslips" API with the employee ID and page parameters
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get payslips for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslips" API with the employee ID and page parameters
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get payslips for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslips" API with the employee ID and page parameters
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetPayslipsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private PageParameters _pageParameters;
+    private bool _isAllPayslips;
+
+    public GetPayslipsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [Given(@"I have valid page parameters")]
+    public void GivenIHaveValidPageParameters()
+    {
+        _pageParameters = new PageParameters { PageSize = 10, PageNumber = 1 }; // Replace with your actual parameters
+    }
+
+    [Given(@"I want to get all payslips")]
+    public void GivenIWantToGetAllPayslips()
+    {
+        _isAllPayslips = true;
+    }
+
+    [When(@"I send a GET request to the ""GetPayslips"" API with the employee ID and page parameters")]
+    public async Task WhenISendAGETRequestToTheGetPayslipsAPIWithTheEmployeeIDAndPageParameters()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayslips/{_employeeId}?pageSize={_pageParameters.PageSize}&pageNumber={_pageParameters.PageNumber}&isAllPayslips={_isAllPayslips}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected payslips")]
+    public void ThenTheResponseShouldMatchTheExpectedPayslips()
+    {
+        // Deserialize the response content to a list of payslips
+        var actualPayslips = JsonConvert.DeserializeObject<List<Payslip>>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected payslips from a file, a database, or hard-code them in your tests
+        var expectedPayslips = ...
+
+        // Compare the actual and expected payslips
+        Assert.Equal
+
+--------------------------------------------------------------------------------
+-- GetPayslipSummaries(int employeeId, [FromQuery] PageParameters pageParameters
+
+Feature: Get Payslip Summaries API
+
+Scenario: Get specific number of payslip summaries for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslipSummaries" API with the employee ID and page parameters
+    Then I should receive a 200 OK status
+    And the response should match the expected payslip summaries
+
+Scenario: Try to get payslip summaries for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslipSummaries" API with the employee ID and page parameters
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get payslip summaries for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslipSummaries" API with the employee ID and page parameters
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get payslip summaries for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    And I have valid page parameters
+    When I send a GET request to the "GetPayslipSummaries" API with the employee ID and page parameters
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetPayslipSummariesSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private PageParameters _pageParameters;
+
+    public GetPayslipSummariesSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [Given(@"I have valid page parameters")]
+    public void GivenIHaveValidPageParameters()
+    {
+        _pageParameters = new PageParameters { PageSize = 10, PageNumber = 1 }; // Replace with your actual parameters
+    }
+
+    [When(@"I send a GET request to the ""GetPayslipSummaries"" API with the employee ID and page parameters")]
+    public async Task WhenISendAGETRequestToTheGetPayslipSummariesAPIWithTheEmployeeIDAndPageParameters()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetPayslipSummaries/{_employeeId}?pageSize={_pageParameters.PageSize}&pageNumber={_pageParameters.PageNumber}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected payslip summaries")]
+    public void ThenTheResponseShouldMatchTheExpectedPayslipSummaries()
+    {
+        // Deserialize the response content to a list of payslip summaries
+        var actualPayslipSummaries = JsonConvert.DeserializeObject<List<PayslipSummary>>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected payslip summaries from a file, a database, or hard-code them in your tests
+        var expectedPayslipSummaries = ...
+
+        // Compare the actual and expected payslip summaries
+        Assert.Equal(expectedPayslipSummaries, actualPayslipSummaries);
+    }
+}
+
+
+---------------------------------------------------------------------------
+// GetTrends(int employeeId)
+Feature: Get Employee Trends API
+
+Scenario: Get trends for an employee with a valid ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetTrends" API with the employee ID
+    Then I should receive a 200 OK status
+    And the response should match the expected trends
+
+Scenario: Try to get trends for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    When I send a GET request to the "GetTrends" API with the employee ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get trends for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    When I send a GET request to the "GetTrends" API with the employee ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get trends for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    When I send a GET request to the "GetTrends" API with the employee ID
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class GetEmployeeTrendsSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+
+    public GetEmployeeTrendsSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [When(@"I send a GET request to the ""GetTrends"" API with the employee ID")]
+    public async Task WhenISendAGETRequestToTheGetTrendsAPIWithTheEmployeeID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/GetTrends/{_employeeId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected trends")]
+    public void ThenTheResponseShouldMatchTheExpectedTrends()
+    {
+        // Deserialize the response content to a list of trends
+        var actualTrends = JsonConvert.DeserializeObject<List<Trend>>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected trends from a file, a database, or hard-code them in your tests
+        var expectedTrends = ...
+
+        // Compare the actual and expected trends
+        Assert.Equal(expectedTrends, actualTrends);
+    }
+}
+--------------------------------------------------------------------------
+// Get(int employeeId, int payeFormId)
+
+Feature: Get Employee PayeForm API
+
+Scenario: Get PayeForm for an employee with a valid ID and a valid PayeForm ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have a valid PayeForm ID
+    When I send a GET request to the "Get" API with the employee ID and the PayeForm ID
+    Then I should receive a 200 OK status
+    And the response should match the expected PayeForm
+
+Scenario: Try to get PayeForm for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have a valid PayeForm ID
+    When I send a GET request to the "Get" API with the employee ID and the PayeForm ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get PayeForm for an employee with a valid ID and an invalid PayeForm ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have an invalid PayeForm ID
+    When I send a GET request to the "Get" API with the employee ID and the PayeForm ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to get PayeForm for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have a valid PayeForm ID
+    When I send a GET request to the "Get" API with the employee ID and the PayeForm ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Get PayeForm for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    And I have a valid PayeForm ID
+    When I send a GET request to the "Get" API with the employee ID and the PayeForm ID
+    Then I should receive a 410 Gone status
+
+
+[Binding]
+public class GetEmployeePayeFormSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private string _payeFormId;
+
+    public GetEmployeePayeFormSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [Given(@"I have a valid PayeForm ID")]
+    public void GivenIHaveAValidPayeFormID()
+    {
+        _payeFormId = "ValidPayeFormId"; // Replace with a method to get a valid PayeForm ID
+    }
+
+    [Given(@"I have an invalid PayeForm ID")]
+    public void GivenIHaveAnInvalidPayeFormID()
+    {
+        _payeFormId = "InvalidPayeFormId"; // Replace with an invalid PayeForm ID
+    }
+
+    [When(@"I send a GET request to the ""Get"" API with the employee ID and the PayeForm ID")]
+    public async Task WhenISendAGETRequestToTheGetAPIWithTheEmployeeIDAndThePayeFormID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/Get/{_employeeId}/{_payeFormId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+
+    [Then(@"the response should match the expected PayeForm")]
+    public void ThenTheResponseShouldMatchTheExpectedPayeForm()
+    {
+        // Deserialize the response content to a PayeForm
+        var actualPayeForm = JsonConvert.DeserializeObject<PayeForm>(_context.Response.Content.ReadAsStringAsync().Result);
+
+        // Load the expected PayeForm from a file, a database, or hard-code it in your tests
+        var expectedPayeForm = ...
+
+        // Compare the actual and expected PayeForm
+        Assert.Equal(expectedPayeForm, actualPayeForm);
+    }
+}
+
+------------------------------------------------------------------------------------
+// SetAsRead(int employeeId, int payeFormId)
+Feature: Set PayeForm as Read API
+
+Scenario: Set PayeForm as read for an employee with a valid ID and a valid PayeForm ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have a valid PayeForm ID
+    When I send a PUT request to the "SetAsRead" API with the employee ID and the PayeForm ID
+    Then I should receive a 200 OK status
+
+Scenario: Try to set PayeForm as read for an employee with an invalid ID
+    Given I have a valid bearer token
+    And I have an invalid employee ID
+    And I have a valid PayeForm ID
+    When I send a PUT request to the "SetAsRead" API with the employee ID and the PayeForm ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to set PayeForm as read for an employee with a valid ID and an invalid PayeForm ID
+    Given I have a valid bearer token
+    And I have a valid employee ID
+    And I have an invalid PayeForm ID
+    When I send a PUT request to the "SetAsRead" API with the employee ID and the PayeForm ID
+    Then I should receive a 404 Not Found status
+
+Scenario: Try to set PayeForm as read for an employee without a bearer token
+    Given I do not have a bearer token
+    And I have a valid employee ID
+    And I have a valid PayeForm ID
+    When I send a PUT request to the "SetAsRead" API with the employee ID and the PayeForm ID
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Set PayeForm as read for an employee that is no longer with the company
+    Given I have a valid bearer token
+    And I have an employee ID of an employee that is no longer with the company
+    And I have a valid PayeForm ID
+    When I send a PUT request to the "SetAsRead" API with the employee ID and the PayeForm ID
+    Then I should receive a 410 Gone status
+
+[Binding]
+public class SetPayeFormAsReadSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private string _payeFormId;
+
+    public SetPayeFormAsReadSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID")]
+    public void GivenIHaveAValidEmployeeID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+    }
+
+    [Given(@"I have an invalid employee ID")]
+    public void GivenIHaveAnInvalidEmployeeID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+    }
+
+    [Given(@"I have an employee ID of an employee that is no longer with the company")]
+    public void GivenIHaveAnEmployeeIDOfAnEmployeeThatIsNoLongerWithTheCompany()
+    {
+        _employeeId = "GoneEmployeeId"; // Replace with an employee ID that is no longer valid
+    }
+
+    [Given(@"I have a valid PayeForm ID")]
+    public void GivenIHaveAValidPayeFormID()
+    {
+        _payeFormId = "ValidPayeFormId"; // Replace with a method to get a valid PayeForm ID
+    }
+
+    [Given(@"I have an invalid PayeForm ID")]
+    public void GivenIHaveAnInvalidPayeFormID()
+    {
+        _payeFormId = "InvalidPayeFormId"; // Replace with an invalid PayeForm ID
+    }
+
+    [When(@"I send a PUT request to the ""SetAsRead"" API with the employee ID and the PayeForm ID")]
+    public async Task WhenISendAPUTRequestToTheSetAsReadAPIWithTheEmployeeIDAndThePayeFormID()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/SetAsRead/{_employeeId}/{_payeFormId}";
+        _context.Response = await _apiHelper.PutAsync(url, null, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 410 Gone status")]
+    public void ThenIShouldReceiveAGoneStatus()
+    {
+        Assert.Equal(HttpStatusCode.Gone, _context.Response.StatusCode);
+    }
+}
+
+
+------------------------------------------------------------------
+// GET /api/endpoint/{employeeId}/{payslipId}
+
+Feature: GetPayslipDetail
+    As an API client 
+    I want to retrieve the payslip details of a given employee 
+    So that I can perform operations on it 
+
+Scenario: Retrieve valid payslip
+    Given I have a valid employee ID and a valid payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}" 
+    Then I should receive a 200 OK status 
+    And the payslip data should match the expected values
+
+Scenario: Retrieve payslip with invalid employee ID
+    Given I have an invalid employee ID and a valid payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}" 
+    Then I should receive a 404 Not Found status
+
+Scenario: Retrieve payslip with non-existing payslip ID
+    Given I have a valid employee ID and a non-existing payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}" 
+    Then I should receive a 404 Not Found status
+
+Scenario: Retrieve payslip with missing authentication
+    Given I have a valid employee ID and a valid payslip ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}" 
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class GetPayslipSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private string _payslipId;
+
+    public GetPayslipSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID and a valid payslip ID")]
+    public void GivenIHaveAValidEmployeeIDAndAValidPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+    }
+
+    [Given(@"I have an invalid employee ID and a valid payslip ID")]
+    public void GivenIHaveAnInvalidEmployeeIDAndAValidPayslipID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+    }
+
+    [Given(@"I have a valid employee ID and a non-existing payslip ID")]
+    public void GivenIHaveAValidEmployeeIDAndANon_ExistingPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "NonExistingPayslipId"; // Replace with a non-existing payslip ID
+    }
+
+    [Given(@"I do not provide authentication in the GET request")]
+    public void GivenIDoNotProvideAuthenticationInTheGETRequest()
+    {
+        _context.BearerToken = null; // Set the bearer token to null to simulate missing authentication
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{employeeId}/{payslipId}""")]
+    public async Task WhenISendAGETRequestToApiEndpointEmployeeIdPayslipId()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_employeeId}/{_payslipId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"the payslip data should match the expected values")]
+    public void ThenThePayslipDataShouldMatchTheExpectedValues()
+    {
+        var actualPayslip = JsonConvert.DeserializeObject<Payslip>(_context.Response.Content.ReadAsStringAsync().Result);
+        var expectedPayslip = new Payslip(); // Replace with the method to get the expected payslip
+
+        Assert.Equal(expectedPayslip, actualPayslip);
+    }
+}
+
+-------------------------------------------------------------------
+// GET /api/endpoint/{employeeId}/{payslipId}/download
+
+Feature: DownloadPayslip
+    As an API client 
+    I want to download the payslip of a given employee 
+    So that I can save it for future reference
+
+Scenario: Download a valid payslip
+    Given I have a valid employee ID and a valid payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/download"
+    Then I should receive a 200 OK status 
+    And the payslip data should be in the correct format
+
+Scenario: Download a payslip with invalid employee ID
+    Given I have an invalid employee ID and a valid payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/download"
+    Then I should receive a 404 Not Found status
+
+Scenario: Download a payslip with non-existing payslip ID
+    Given I have a valid employee ID and a non-existing payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/download"
+    Then I should receive a 404 Not Found status
+
+Scenario: Download a payslip without authentication
+    Given I have a valid employee ID and a valid payslip ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/download"
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class DownloadPayslipSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private string _payslipId;
+
+    public DownloadPayslipSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID and a valid payslip ID")]
+    public void GivenIHaveAValidEmployeeIDAndAValidPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+    }
+
+    [Given(@"I have an invalid employee ID and a valid payslip ID")]
+    public void GivenIHaveAnInvalidEmployeeIDAndAValidPayslipID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+    }
+
+    [Given(@"I have a valid employee ID and a non-existing payslip ID")]
+    public void GivenIHaveAValidEmployeeIDAndANon_ExistingPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "NonExistingPayslipId"; // Replace with a non-existing payslip ID
+    }
+
+    [Given(@"I do not provide authentication in the GET request")]
+    public void GivenIDoNotProvideAuthenticationInTheGETRequest()
+    {
+        _context.BearerToken = null; // Set the bearer token to null to simulate missing authentication
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{employeeId}/{payslipId}/download""")]
+    public async Task WhenISendAGETRequestToApiEndpointEmployeeIdPayslipIdDownload()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_employeeId}/{_payslipId}/download";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a 200 OK status")]
+    public void ThenIShouldReceiveAOKStatus()
+    {
+        Assert.Equal(HttpStatusCode.OK, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 404 Not Found status")]
+    public void ThenIShouldReceiveANotFoundStatus()
+    {
+        Assert.Equal(HttpStatusCode.NotFound, _context.Response.StatusCode);
+    }
+
+    [Then(@"I should receive a 401 Unauthorized status")]
+    public void ThenIShouldReceiveAUnauthorizedStatus()
+    {
+        Assert.Equal(HttpStatusCode.Unauthorized, _context.Response.StatusCode);
+    }
+
+    [Then(@"the payslip data should be in the correct format")]
+    public void ThenThePayslipDataShouldBeInTheCorrectFormat()
+    {
+        // Replace this with your own logic for checking the format of the downloaded payslip
+        Assert.True(_context.Response.Content.Headers.ContentType.MediaType == "application/pdf");
+    }
+}
+
+-------------------------------------------------
+// GET /api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}
+
+Feature: PayslipComparison
+    As an API client 
+    I want to compare the current payslip with the previous one of a given employee 
+    So that I can check for any changes in salary, deductions etc.
+
+Scenario: Compare valid payslips
+    Given I have a valid employee ID, current payslip ID and previous payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}"
+    Then I should receive a 200 OK status 
+    And the comparison data should be in the correct format
+
+Scenario: Compare payslips with invalid employee ID
+    Given I have an invalid employee ID, valid current payslip ID and valid previous payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Compare payslips with non-existing current payslip ID
+    Given I have a valid employee ID, non-existing current payslip ID and valid previous payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Compare payslips with non-existing previous payslip ID
+    Given I have a valid employee ID, valid current payslip ID and non-existing previous payslip ID
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Compare payslips without authentication
+    Given I have a valid employee ID, valid current payslip ID and valid previous payslip ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}"
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class PayslipComparisonSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _employeeId;
+    private string _payslipId;
+    private string _previousPayslipId;
+
+    public PayslipComparisonSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid employee ID, current payslip ID and previous payslip ID")]
+    public void GivenIHaveAValidEmployeeIDCurrentPayslipIDAndPreviousPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+        _previousPayslipId = "ValidPreviousPayslipId"; // Replace with a method to get a valid previous payslip ID
+    }
+
+    [Given(@"I have an invalid employee ID, valid current payslip ID and valid previous payslip ID")]
+    public void GivenIHaveAnInvalidEmployeeIDValidCurrentPayslipIDAndValidPreviousPayslipID()
+    {
+        _employeeId = "InvalidEmployeeId"; // Replace with an invalid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+        _previousPayslipId = "ValidPreviousPayslipId"; // Replace with a method to get a valid previous payslip ID
+    }
+
+    [Given(@"I have a valid employee ID, non-existing current payslip ID and valid previous payslip ID")]
+    public void GivenIHaveAValidEmployeeIDNon_ExistingCurrentPayslipIDAndValidPreviousPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "NonExistingPayslipId"; // Replace with a non-existing payslip ID
+        _previousPayslipId = "ValidPreviousPayslipId"; // Replace with a method to get a valid previous payslip ID
+    }
+
+    [Given(@"I have a valid employee ID, valid current payslip ID and non-existing previous payslip ID")]
+    public void GivenIHaveAValidEmployeeIDValidCurrentPayslipIDAndNon_ExistingPreviousPayslipID()
+    {
+        _employeeId = "ValidEmployeeId"; // Replace with a method to get a valid employee ID
+        _payslipId = "ValidPayslipId"; // Replace with a method to get a valid payslip ID
+        _previousPayslipId = "NonExistingPreviousPayslipId"; // Replace with a non-existing previous payslip ID
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{employeeId}/{payslipId}/comparison/{previousPayslipId}""")]
+    public async Task WhenISendAGETRequestToApiEndpointEmployeeIdPayslipIdComparisonPreviousPayslipId()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_employeeId}/{_payslipId}/comparison/{_previousPayslipId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"the comparison data should be in the correct format")]
+    public void ThenTheComparisonDataShouldBeInTheCorrectFormat()
+    {
+        // Replace this
+
+----------------------------------
+// GET /api/endpoint/{userId}/{addressId}
+
+Feature: UserAddress
+    As an API client 
+    I want to get the address details of a given user 
+    So that I can use this information for other processing
+
+Scenario: Get valid user's address
+    Given I have a valid user ID and valid address ID
+    When I send a GET request to "/api/endpoint/{userId}/{addressId}"
+    Then I should receive a 200 OK status 
+    And the address data should be in the correct format
+
+Scenario: Get address with invalid user ID
+    Given I have an invalid user ID and a valid address ID
+    When I send a GET request to "/api/endpoint/{userId}/{addressId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Get address with non-existing address ID
+    Given I have a valid user ID and non-existing address ID
+    When I send a GET request to "/api/endpoint/{userId}/{addressId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Get address without authentication
+    Given I have a valid user ID and valid address ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{userId}/{addressId}"
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class UserAddressSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private string _addressId;
+
+    public UserAddressSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID and valid address ID")]
+    public void GivenIHaveAValidUserIDAndValidAddressID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _addressId = "ValidAddressId"; // Replace with a method to get a valid address ID
+    }
+
+    [Given(@"I have an invalid user ID and a valid address ID")]
+    public void GivenIHaveAnInvalidUserIDAndAValidAddressID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+        _addressId = "ValidAddressId"; // Replace with a method to get a valid address ID
+    }
+
+    [Given(@"I have a valid user ID and non-existing address ID")]
+    public void GivenIHaveAValidUserIDAndNon_ExistingAddressID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _addressId = "NonExistingAddressId"; // Replace with a non-existing address ID
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{userId}/{addressId}""")]
+    public async Task WhenISendAGETRequestToApiEndpointUserIdAddressId()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/{_addressId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"the address data should be in the correct format")]
+    public void ThenTheAddressDataShouldBeInTheCorrectFormat()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var address = JsonConvert.DeserializeObject<Address>(responseContent);
+
+        // Assert that address is not null and has correct format.
+        Assert.NotNull(address);
+        Assert.True(IsValidAddressFormat(address));
+    }
+
+    private bool IsValidAddressFormat(Address address)
+    {
+        // Replace this with your own logic to validate address format.
+        return true;
+    }
+}
+
+
+---------------------------------------------------------------------------------------
+// PUT /api/endpoint/{userId}/{addressId}
+
+Feature: UpdateUserAddress
+    As an API client 
+    I want to update the address details of a given user 
+    So that the user information is kept up-to-date
+
+Scenario: Update a valid user's address with valid data
+    Given I have a valid user ID, valid address ID and valid address data
+    When I send a PUT request to "/api/endpoint/{userId}/{addressId}" with the address data
+    Then I should receive a 200 OK status 
+    And the updated address data should be returned in the response
+
+Scenario: Update address with invalid user ID
+    Given I have an invalid user ID, a valid address ID and valid address data
+    When I send a PUT request to "/api/endpoint/{userId}/{addressId}" with the address data
+    Then I should receive a 404 Not Found status
+
+Scenario: Update address with non-existing address ID
+    Given I have a valid user ID, non-existing address ID and valid address data
+    When I send a PUT request to "/api/endpoint/{userId}/{addressId}" with the address data
+    Then I should receive a 404 Not Found status
+
+Scenario: Update address with invalid address data
+    Given I have a valid user ID, valid address ID and invalid address data
+    When I send a PUT request to "/api/endpoint/{userId}/{addressId}" with the address data
+    Then I should receive a 400 Bad Request status
+
+Scenario: Update address without authentication
+    Given I have a valid user ID, valid address ID and valid address data
+    But I do not provide authentication in the PUT request
+    When I send a PUT request to "/api/endpoint/{userId}/{addressId}" with the address data
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class UpdateUserAddressSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private string _addressId;
+    private SaveUserAddress _saveUserAddress;
+
+    public UpdateUserAddressSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID, valid address ID and valid address data")]
+    public void GivenIHaveAValidUserIDValidAddressIDAndValidAddressData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _addressId = "ValidAddressId"; // Replace with a method to get a valid address ID
+        _saveUserAddress = new SaveUserAddress { /* Fill this with valid data */ };
+    }
+
+    [Given(@"I have an invalid user ID, a valid address ID and valid address data")]
+    public void GivenIHaveAnInvalidUserIDAValidAddressIDAndValidAddressData()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+        _addressId = "ValidAddressId"; // Replace with a method to get a valid address ID
+        _saveUserAddress = new SaveUserAddress { /* Fill this with valid data */ };
+    }
+
+    [Given(@"I have a valid user ID, non-existing address ID and valid address data")]
+    public void GivenIHaveAValidUserIDNon_ExistingAddressIDAndValidAddressData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _addressId = "NonExistingAddressId"; // Replace with a non-existing address ID
+        _saveUserAddress = new SaveUserAddress { /* Fill this with valid data */ };
+    }
+
+    [Given(@"I have a valid user ID, valid address ID and invalid address data")]
+    public void GivenIHaveAValidUserIDValidAddressIDAndInvalidAddressData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _addressId = "ValidAddressId"; // Replace with a method to get a valid address ID
+        _saveUserAddress = new SaveUserAddress { /* Fill this with invalid data */ };
+    }
+
+    [When(@"I send a PUT request to ""/api/endpoint/{userId}/{addressId}"" with the address data")]
+    public async Task WhenISendAPUTRequestToApiEndpointUserIdAddressIdWithTheAddressData()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/{_addressId}";
+        _context.Response = await _apiHelper.PutAsync(url, _saveUserAddress, _context.BearerToken);
+    }
+
+    [Then(@"the updated address data should be returned in the response")]
+    public async Task ThenTheUpdatedAddressDataShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var address = JsonConvert.DeserializeObject<Address>(responseContent);
+
+        // Assert that address is not null and has correct format.
+        Assert.NotNull(address);
+        Assert.True(IsValidAddressFormat(address));
+    }
+
+    private bool IsValidAddressFormat(Address address)
+    {
+        // Replace this with your own logic to validate address format.
+        return true;
+    }
+}
+
+--------------------------------------------------------------
+// GET /api/endpoint/{userId}
+
+Feature: GetUser
+    As an API client 
+    I want to retrieve the details of a given user 
+    So that I can view the user's information
+
+Scenario: Retrieve valid user's details
+    Given I have a valid user ID
+    When I send a GET request to "/api/endpoint/{userId}"
+    Then I should receive a 200 OK status 
+    And the user's details should be returned in the response
+
+Scenario: Retrieve details with invalid user ID
+    Given I have an invalid user ID
+    When I send a GET request to "/api/endpoint/{userId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Retrieve user's details without authentication
+    Given I have a valid user ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{userId}"
+    Then I should receive a 401 Unauthorized status
+[Binding]
+public class GetUserSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+
+    public GetUserSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{userId}""")]
+    public async Task WhenISendAGETRequestToApiEndpointUserId()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"the user's details should be returned in the response")]
+    public async Task ThenTheUserSDetailsShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var user = JsonConvert.DeserializeObject<User>(responseContent);
+
+        // Assert that user is not null and has correct format.
+        Assert.NotNull(user);
+        Assert.True(IsValidUserFormat(user));
+    }
+
+    private bool IsValidUserFormat(User user)
+    {
+        // Replace this with your own logic to validate user format.
+        return true;
+    }
+}
+-----------------------------------------------------
+// PUT /api/endpoint/{userId}
+Feature: UpdateUser
+    As an API client 
+    I want to update the details of a given user 
+    So that I can modify the user's information
+
+Scenario: Update valid user's details
+    Given I have a valid user ID and valid user data
+    When I send a PUT request to "/api/endpoint/{userId}" with the user data
+    Then I should receive a 200 OK status 
+    And the updated user's details should be returned in the response
+
+Scenario: Update details with invalid user ID
+    Given I have an invalid user ID and valid user data
+    When I send a PUT request to "/api/endpoint/{userId}" with the user data
+    Then I should receive a 404 Not Found status
+
+Scenario: Update user's details with invalid data
+    Given I have a valid user ID and invalid user data
+    When I send a PUT request to "/api/endpoint/{userId}" with the user data
+    Then I should receive a 400 Bad Request status
+
+Scenario: Update user's details without authentication
+    Given I have a valid user ID and valid user data
+    But I do not provide authentication in the PUT request
+    When I send a PUT request to "/api/endpoint/{userId}" with the user data
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class UpdateUserSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private SaveUser _saveUser;
+
+    public UpdateUserSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID and valid user data")]
+    public void GivenIHaveAValidUserIDAndValidUserData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _saveUser = new SaveUser
+        {
+            // fill the SaveUser object with valid data
+        };
+    }
+
+    [Given(@"I have an invalid user ID and valid user data")]
+    public void GivenIHaveAnInvalidUserIDAndValidUserData()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+        _saveUser = new SaveUser
+        {
+            // fill the SaveUser object with valid data
+        };
+    }
+
+    [Given(@"I have a valid user ID and invalid user data")]
+    public void GivenIHaveAValidUserIDAndInvalidUserData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _saveUser = new SaveUser
+        {
+            // fill the SaveUser object with invalid data
+        };
+    }
+
+    [When(@"I send a PUT request to ""/api/endpoint/{userId}"" with the user data")]
+    public async Task WhenISendAPUTRequestToApiEndpointUserIdWithTheUserData()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}";
+        _context.Response = await _apiHelper.PutAsync(url, _saveUser, _context.BearerToken);
+    }
+
+    [Then(@"the updated user's details should be returned in the response")]
+    public async Task ThenTheUpdatedUserSDetailsShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var user = JsonConvert.DeserializeObject<User>(responseContent);
+
+        // Assert that user is not null and has correct format.
+        Assert.NotNull(user);
+        Assert.True(IsValidUserFormat(user));
+    }
+
+    private bool IsValidUserFormat(User user)
+    {
+        // Replace this with your own logic to validate user format.
+        return true;
+    }
+}
+
+----------------------------------------------------
+// UpdateLite(int userId, [FromForm] SaveUserLite saveUser)
+Feature: UpdateLiteUser
+    As an API client
+    I want to update basic details of a given user
+    So that I can modify the user's information with less data fields
+
+Scenario: Update valid user's lite details
+    Given I have a valid user ID and valid lite user data
+    When I send a PUT request to "/api/endpoint/lite/{userId}" with the lite user data
+    Then I should receive a 200 OK status
+    And the updated user's lite details should be returned in the response
+
+Scenario: Update lite details with invalid user ID
+    Given I have an invalid user ID and valid lite user data
+    When I send a PUT request to "/api/endpoint/lite/{userId}" with the lite user data
+    Then I should receive a 404 Not Found status
+
+Scenario: Update user's lite details with invalid data
+    Given I have a valid user ID and invalid lite user data
+    When I send a PUT request to "/api/endpoint/lite/{userId}" with the lite user data
+    Then I should receive a 400 Bad Request status
+
+Scenario: Update user's lite details without authentication
+    Given I have a valid user ID and valid lite user data
+    But I do not provide authentication in the PUT request
+    When I send a PUT request to "/api/endpoint/lite/{userId}" with the lite user data
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class UpdateLiteUserSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private SaveUserLite _saveUserLite;
+
+    public UpdateLiteUserSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID and valid lite user data")]
+    public void GivenIHaveAValidUserIDAndValidLiteUserData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _saveUserLite = new SaveUserLite
+        {
+            // fill the SaveUserLite object with valid data
+        };
+    }
+
+    [Given(@"I have an invalid user ID and valid lite user data")]
+    public void GivenIHaveAnInvalidUserIDAndValidLiteUserData()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+        _saveUserLite = new SaveUserLite
+        {
+            // fill the SaveUserLite object with valid data
+        };
+    }
+
+    [Given(@"I have a valid user ID and invalid lite user data")]
+    public void GivenIHaveAValidUserIDAndInvalidLiteUserData()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _saveUserLite = new SaveUserLite
+        {
+            // fill the SaveUserLite object with invalid data
+        };
+    }
+
+    [When(@"I send a PUT request to ""/api/endpoint/lite/{userId}"" with the lite user data")]
+    public async Task WhenISendAPUTRequestToApiEndpointLiteUserIdWithTheLiteUserData()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/lite/{_userId}";
+        _context.Response = await _apiHelper.PutAsync(url, _saveUserLite, _context.BearerToken);
+    }
+
+    [Then(@"the updated user's lite details should be returned in the response")]
+    public async Task ThenTheUpdatedUserSLiteDetailsShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var user = JsonConvert.DeserializeObject<User>(responseContent);
+
+        // Assert that user is not null and has correct format.
+        Assert.NotNull(user);
+        Assert.True(IsValidUserFormat(user));
+    }
+
+    private bool IsValidUserFormat(User user)
+    {
+        // Replace this with your own logic to validate user format.
+        return true;
+    }
+}
+
+---------------------------------------------------------------------------------------------
+// GetAddresses(int userId)
+
+Feature: GetAddresses
+    As an API client
+    I want to get a list of addresses for a given user
+    So that I can retrieve all the addresses of that user
+
+Scenario: Retrieve all addresses for a valid user
+    Given I have a valid user ID
+    When I send a GET request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 200 OK status
+    And a list of addresses for the user should be returned in the response
+
+Scenario: Retrieve addresses with invalid user ID
+    Given I have an invalid user ID
+    When I send a GET request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 404 Not Found status
+
+Scenario: Retrieve addresses without authentication
+    Given I have a valid user ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 401 Unauthorized status
+
+Scenario: Retrieve addresses for a user without any addresses
+    Given I have a valid user ID
+    But the user does not have any addresses
+    When I send a GET request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 200 OK status
+    And an empty list should be returned in the response
+
+
+[Binding]
+public class GetAddressesSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+
+    public GetAddressesSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [Given(@"I do not provide authentication in the GET request")]
+    public void GivenIDoNotProvideAuthenticationInTheGETRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [Given(@"the user does not have any addresses")]
+    public void GivenTheUserDoesNotHaveAnyAddresses()
+    {
+        // If required, set up the state for this scenario here
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{userId}/addresses""")]
+    public async Task WhenISendAGETRequestToApiEndpointUserIdAddresses()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/addresses";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"a list of addresses for the user should be returned in the response")]
+    public async Task ThenAListOfAddressesForTheUserShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var addresses = JsonConvert.DeserializeObject<List<Address>>(responseContent);
+
+        // Assert that addresses is not null and has correct format.
+        Assert.NotNull(addresses);
+        Assert.All(addresses, address => Assert.True(IsValidAddressFormat(address)));
+    }
+
+    [Then(@"an empty list should be returned in the response")]
+    public async Task ThenAnEmptyListShouldBeReturnedInTheResponse()
+    {
+        // Replace this with the correct assertion. For example:
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var addresses = JsonConvert.DeserializeObject<List<Address>>(responseContent);
+
+        // Assert that addresses is an empty list.
+        Assert.NotNull(addresses);
+        Assert.Empty(addresses);
+    }
+
+    private bool IsValidAddressFormat(Address address)
+    {
+        // Replace this with your own logic to validate address format.
+        return true;
+    }
+}
+
+--------------------------------------------------------
+// InsertAddress(int userId, [FromForm] SaveUserAddress saveUserAddress)
+
+Feature: InsertAddress
+    As an API client
+    I want to add a new address for a given user
+    So that I can store new address information for that user
+
+Scenario: Insert a valid address for a valid user
+    Given I have a valid user ID
+    And I have a valid address to insert
+    When I send a POST request to "/api/endpoint/{userId}/address"
+    Then I should receive a 201 Created status
+    And the new address should be in the user's list of addresses
+
+Scenario: Insert an invalid address for a valid user
+    Given I have a valid user ID
+    And I have an invalid address to insert
+    When I send a POST request to "/api/endpoint/{userId}/address"
+    Then I should receive a 400 Bad Request status
+
+Scenario: Insert a valid address with invalid user ID
+    Given I have an invalid user ID
+    And I have a valid address to insert
+    When I send a POST request to "/api/endpoint/{userId}/address"
+    Then I should receive a 404 Not Found status
+
+Scenario: Insert address without authentication
+    Given I have a valid user ID
+    And I have a valid address to insert
+    But I do not provide authentication in the POST request
+    When I send a POST request to "/api/endpoint/{userId}/address"
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class InsertAddressSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private SaveUserAddress _saveUserAddress;
+
+    public InsertAddressSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [Given(@"I have a valid address to insert")]
+    public void GivenIHaveAValidAddressToInsert()
+    {
+        _saveUserAddress = new SaveUserAddress 
+        {
+            // Initialize SaveUserAddress object with valid data
+        };
+    }
+
+    [Given(@"I have an invalid address to insert")]
+    public void GivenIHaveAnInvalidAddressToInsert()
+    {
+        _saveUserAddress = new SaveUserAddress 
+        {
+            // Initialize SaveUserAddress object with invalid data
+        };
+    }
+
+    [Given(@"I do not provide authentication in the POST request")]
+    public void GivenIDoNotProvideAuthenticationInThePOSTRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [When(@"I send a POST request to ""/api/endpoint/{userId}/address""")]
+    public async Task WhenISendAPOSTRequestToApiEndpointUserIdAddress()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/address";
+        _context.Response = await _apiHelper.PostAsync(url, _saveUserAddress, _context.BearerToken);
+    }
+
+    [Then(@"the new address should be in the user's list of addresses")]
+    public async Task ThenTheNewAddressShouldBeInTheUserSListOfAddresses()
+    {
+        // After insertion, retrieve the addresses and verify if the new one was added.
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/addresses";
+        var response = await _apiHelper.GetAsync(url, _context.BearerToken);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var addresses = JsonConvert.DeserializeObject<List<Address>>(responseContent);
+
+        // Assert that the new address is in the list.
+        Assert.Contains(addresses, address => address.Equals(_saveUserAddress));
+    }
+}
+
+--------------------------------------------------
+// InsertAddresses(int userId, [FromBody] IEnumerable<SaveUserAddresses> saveUserAddresses)
+Feature: InsertAddresses
+    As an API client
+    I want to add new addresses for a given user
+    So that I can store new address information for that user
+
+Scenario: Insert a list of valid addresses for a valid user
+    Given I have a valid user ID
+    And I have a valid list of addresses to insert
+    When I send a POST request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 201 Created status
+    And the new addresses should be in the user's list of addresses
+
+Scenario: Insert a list with an invalid address for a valid user
+    Given I have a valid user ID
+    And I have a list with an invalid address to insert
+    When I send a POST request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 400 Bad Request status
+
+Scenario: Insert a list of valid addresses for an invalid user ID
+    Given I have an invalid user ID
+    And I have a valid list of addresses to insert
+    When I send a POST request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 404 Not Found status
+
+Scenario: Insert a list of addresses without authentication
+    Given I have a valid user ID
+    And I have a valid list of addresses to insert
+    But I do not provide authentication in the POST request
+    When I send a POST request to "/api/endpoint/{userId}/addresses"
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class InsertAddressesSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private List<SaveUserAddress> _saveUserAddresses;
+
+    public InsertAddressesSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [Given(@"I have a valid list of addresses to insert")]
+    public void GivenIHaveAValidListOfAddressesToInsert()
+    {
+        _saveUserAddresses = new List<SaveUserAddress> 
+        {
+            // Initialize a list of SaveUserAddress objects with valid data
+        };
+    }
+
+    [Given(@"I have a list with an invalid address to insert")]
+    public void GivenIHaveAListWithAnInvalidAddressToInsert()
+    {
+        _saveUserAddresses = new List<SaveUserAddress> 
+        {
+            // Initialize a list of SaveUserAddress objects, at least one of them with invalid data
+        };
+    }
+
+    [Given(@"I do not provide authentication in the POST request")]
+    public void GivenIDoNotProvideAuthenticationInThePOSTRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [When(@"I send a POST request to ""/api/endpoint/{userId}/addresses""")]
+    public async Task WhenISendAPOSTRequestToApiEndpointUserIdAddresses()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/addresses";
+        _context.Response = await _apiHelper.PostAsync(url, _saveUserAddresses, _context.BearerToken);
+    }
+
+    [Then(@"the new addresses should be in the user's list of addresses")]
+    public async Task ThenTheNewAddressesShouldBeInTheUserSListOfAddresses()
+    {
+        // After insertion, retrieve the addresses and verify if the new ones were added.
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/addresses";
+        var response = await _apiHelper.GetAsync(url, _context.BearerToken);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var addresses = JsonConvert.DeserializeObject<List<Address>>(responseContent);
+
+        // Assert that the new addresses are in the list.
+        foreach (var saveUserAddress in _saveUserAddresses)
+        {
+            Assert.Contains(addresses, address => address.Equals(saveUserAddress));
+        }
+    }
+}
+
+---------------------------------------------------
+// GetCreditScore(int userId)
+
+Feature: GetCreditScore
+    As an API client
+    I want to get the credit score of a given user
+    So that I can use the credit score for other calculations or decisions
+
+Scenario: Get credit score for a valid user
+    Given I have a valid user ID
+    When I send a GET request to "/api/endpoint/{userId}/creditscore"
+    Then I should receive a 200 OK status
+    And I should receive a credit score in the response
+
+Scenario: Get credit score for an invalid user
+    Given I have an invalid user ID
+    When I send a GET request to "/api/endpoint/{userId}/creditscore"
+    Then I should receive a 404 Not Found status
+
+Scenario: Get credit score without authentication
+    Given I have a valid user ID
+    But I do not provide authentication in the GET request
+    When I send a GET request to "/api/endpoint/{userId}/creditscore"
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class GetCreditScoreSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+
+    public GetCreditScoreSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [Given(@"I do not provide authentication in the GET request")]
+    public void GivenIDoNotProvideAuthenticationInTheGETRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [When(@"I send a GET request to ""/api/endpoint/{userId}/creditscore""")]
+    public async Task WhenISendAGETRequestToApiEndpointUserIdCreditscore()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/creditscore";
+        _context.Response = await _apiHelper.GetAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"I should receive a credit score in the response")]
+    public async Task ThenIShouldReceiveACreditScoreInTheResponse()
+    {
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var creditScore = JsonConvert.DeserializeObject<int>(responseContent);
+
+        Assert.IsType<int>(creditScore);
+    }
+}
+
+------------------------------------------------------
+// InsertCreditScoreConsent(int userId)
+
+Feature: InsertCreditScoreConsent
+    As an API client
+    I want to insert the credit score consent for a given user
+    So that the user's consent for their credit score to be used can be tracked
+
+Scenario: Insert credit score consent for a valid user
+    Given I have a valid user ID
+    When I send a POST request to "/api/endpoint/{userId}/creditscoreconsent"
+    Then I should receive a 200 OK status
+    And the response should confirm the user's credit score consent was received
+
+Scenario: Insert credit score consent for an invalid user
+    Given I have an invalid user ID
+    When I send a POST request to "/api/endpoint/{userId}/creditscoreconsent"
+    Then I should receive a 404 Not Found status
+
+Scenario: Insert credit score consent without authentication
+    Given I have a valid user ID
+    But I do not provide authentication in the POST request
+    When I send a POST request to "/api/endpoint/{userId}/creditscoreconsent"
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class InsertCreditScoreConsentSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+
+    public InsertCreditScoreConsentSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID")]
+    public void GivenIHaveAValidUserID()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+    }
+
+    [Given(@"I have an invalid user ID")]
+    public void GivenIHaveAnInvalidUserID()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+    }
+
+    [Given(@"I do not provide authentication in the POST request")]
+    public void GivenIDoNotProvideAuthenticationInThePOSTRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [When(@"I send a POST request to ""/api/endpoint/{userId}/creditscoreconsent""")]
+    public async Task WhenISendAPOSTRequestToApiEndpointUserIdCreditscoreconsent()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/creditscoreconsent";
+        _context.Response = await _apiHelper.PostAsync(url, _context.BearerToken);
+    }
+
+    [Then(@"the response should confirm the user's credit score consent was received")]
+    public async Task ThenTheResponseShouldConfirmTheUserSCreditScoreConsentWasReceived()
+    {
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var consentConfirmation = JsonConvert.DeserializeObject<ConsentConfirmation>(responseContent);
+
+        Assert.True(consentConfirmation.ConsentReceived);
+    }
+}
+
+--------------------------------------------------------------------
+// SetPin(int userId, [FromBody] SetPinRequest setPinRequest)
+Feature: SetPin
+    As an API client
+    I want to set a PIN for a given user
+    So that the user can use the PIN for future authentications
+
+Scenario: Set a new PIN for a valid user
+    Given I have a valid user ID and a PIN request
+    When I send a PUT request to "/api/endpoint/{userId}/setpin" with the PIN request
+    Then I should receive a 200 OK status
+    And the response should confirm that the user's PIN was set
+
+Scenario: Attempt to set a new PIN for an invalid user
+    Given I have an invalid user ID and a PIN request
+    When I send a PUT request to "/api/endpoint/{userId}/setpin" with the PIN request
+    Then I should receive a 404 Not Found status
+
+Scenario: Set a new PIN without providing a PIN request
+    Given I have a valid user ID but no PIN request
+    When I send a PUT request to "/api/endpoint/{userId}/setpin" without a PIN request
+    Then I should receive a 400 Bad Request status
+
+Scenario: Attempt to set a new PIN without authentication
+    Given I have a valid user ID and a PIN request
+    But I do not provide authentication in the PUT request
+    When I send a PUT request to "/api/endpoint/{userId}/setpin" with the PIN request
+    Then I should receive a 401 Unauthorized status
+
+[Binding]
+public class SetPinSteps
+{
+    private readonly TestContext _context;
+    private readonly ApiHelper _apiHelper;
+    private string _userId;
+    private SetPinRequest _pinRequest;
+
+    public SetPinSteps(TestContext context, ApiHelper apiHelper)
+    {
+        _context = context;
+        _apiHelper = apiHelper;
+    }
+
+    [Given(@"I have a valid user ID and a PIN request")]
+    public void GivenIHaveAValidUserIDAndAPINRequest()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _pinRequest = new SetPinRequest { Pin = "1234" }; // Replace with actual PIN request data
+    }
+
+    [Given(@"I have an invalid user ID and a PIN request")]
+    public void GivenIHaveAnInvalidUserIDAndAPINRequest()
+    {
+        _userId = "InvalidUserId"; // Replace with an invalid user ID
+        _pinRequest = new SetPinRequest { Pin = "1234" }; // Replace with actual PIN request data
+    }
+
+    [Given(@"I have a valid user ID but no PIN request")]
+    public void GivenIHaveAValidUserIDButNoPINRequest()
+    {
+        _userId = "ValidUserId"; // Replace with a method to get a valid user ID
+        _pinRequest = null;
+    }
+
+    [Given(@"I do not provide authentication in the PUT request")]
+    public void GivenIDoNotProvideAuthenticationInThePUTRequest()
+    {
+        _context.BearerToken = null; // Removing authentication
+    }
+
+    [When(@"I send a PUT request to ""/api/endpoint/{userId}/setpin"" with the PIN request")]
+    public async Task WhenISendAPUTRequestToApiEndpointUserIdSetpinWithThePINRequest()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/setpin";
+        _context.Response = await _apiHelper.PutAsync(url, _pinRequest, _context.BearerToken);
+    }
+
+    [When(@"I send a PUT request to ""/api/endpoint/{userId}/setpin"" without a PIN request")]
+    public async Task WhenISendAPUTRequestToApiEndpointUserIdSetpinWithoutAPINRequest()
+    {
+        var url = $"{_context.ApiConfig.BaseUrl}/api/endpoint/{_userId}/setpin";
+        _context.Response = await _apiHelper.PutAsync(url, null, _context.BearerToken);
+    }
+
+    [Then(@"the response should confirm that the user's PIN was set")]
+    public async Task ThenTheResponseShouldConfirmThatTheUserSPINWasSet()
+    {
+        var responseContent = await _context.Response.Content.ReadAsStringAsync();
+        var pinConfirmation = JsonConvert.DeserializeObject<PinConfirmation>(responseContent);
+
+        Assert.True(pinConfirmation.PinSet);
+    }
+}
+
+-----------------------------------------------------------------------
+// Update(int userId, int creditScoreId)
+
+Feature: UpdateCreditScore
+    As an API client
+    I want to update a user's credit score
+    So that the user's current credit score is reflected in the system
+
+Scenario: Update credit score for a valid user and valid credit score
+    Given I have a valid user ID and a valid credit score ID
+    When I send a PUT request to "/api/endpoint/{userId}/creditscore/{creditScoreId}" 
+    Then I should receive a 200 OK status
+    And the response should confirm that the credit score was updated
+
+Scenario: Attempt to update credit score for an invalid user
+    Given I have an invalid user ID and a valid credit score ID
+    When I send a PUT request to "/api/endpoint/{userId}/creditscore/{creditScoreId}"
+    Then I should receive a 404 Not Found status
+
+Scenario: Attempt to update credit score with an invalid credit score ID
+    Given I have a valid user ID and an invalid credit score ID
+    When I send a PUT request to "/api/endpoint/{userId}/creditscore/{creditScoreId}" 
+    Then I should receive a 400 Bad Request status
+
+Scenario: Attempt to update credit score without providing credit score ID
+    Given I have a valid user ID but no credit score ID
+    When I send a PUT request to "/api/endpoint/{userId}/creditscore" 
+    Then I should receive a 400 Bad Request status
+
+Scenario: Attempt to update credit score without authentication
+    Given I have a valid user ID and a valid credit score ID
+    But I do not provide authentication in the PUT request
+    When I send a PUT request to "/api/endpoint/{userId}/creditscore/{creditScoreId}" 
+    Then I should receive a 401 Unauthorized status
+
+
+[Binding]
+public class UpdateCreditScoreSteps
+{
+    private readonly ScenarioContext _scenarioContext;
+    private readonly TestContext _testContext;
+    private HttpResponseMessage _response;
+    private int _userId;
+    private int _creditScoreId;
+
+    public UpdateCreditScoreSteps(ScenarioContext scenarioContext, TestContext testContext)
+    {
+        _scenarioContext = scenarioContext;
+        _testContext = testContext;
+    }
+
+    [Given(@"I have a valid user ID and a valid credit score ID")]
+    public void GivenIHaveAValidUserIdAndACreditScoreId()
+    {
+        _userId = 1; // replace with actual user ID
+        _creditScoreId = 1; // replace with actual credit score ID
+    }
+
+    [Given(@"I have an invalid user ID and a valid credit score ID")]
+    public void GivenIHaveAnInvalidUserIdAndACreditScoreId()
+    {
+        _userId = -1; // replace with invalid user ID
+        _creditScoreId = 1; // replace with actual credit score ID
+    }
+
+    [Given(@"I have a valid user ID and an invalid credit score ID")]
+    public void GivenIHaveAValidUserIdAndAnInvalidCreditScoreId()
+    {
+        _userId = 1; // replace with actual user ID
+        _creditScoreId = -1; // replace with invalid credit score ID
+    }
+
+    [Given(@"I have a valid user ID but no credit score ID")]
+    public void GivenIHaveAValidUserIdButNoCreditScoreId()
+    {
+        _userId = 1; // replace with actual user ID
+        _creditScoreId = 0; // replace with invalid credit score ID
+    }
+
+    [When(@"I send a PUT request to ""(.*)""")]
+    public async Task WhenISendAPUTRequestTo(string relativeUrl)
+    {
+        var requestUrl = $"{_testContext.BaseUrl}{relativeUrl.Replace("{userId}", _userId.ToString()).Replace("{creditScoreId}", _creditScoreId.ToString())}";
+        _response = await _testContext.Client.PutAsync(requestUrl, new StringContent(JsonConvert.SerializeObject(new object()), Encoding.UTF8, "application/json"));
+    }
+
+    [Then(@"I should receive a (.*) status")]
+    public void ThenIShouldReceiveAStatus(int status)
+    {
+        Assert.AreEqual(status, (int)_response.StatusCode);
+    }
+
+    [Then(@"the response should confirm that the credit score was updated")]
+    public async Task ThenTheResponseShouldConfirmThatTheCreditScoreWasUpdated()
+    {
+        var responseString = await _response.Content.ReadAsStringAsync();
+        var responseObj = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+        Assert.AreEqual(_creditScoreId, (int)responseObj.creditScoreId);
+    }
+}
+
