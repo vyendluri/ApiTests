@@ -1,0 +1,113 @@
+Story 1: Automate Testing for Mobile Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile Module API endpoints using C# and SpecFlow to ensure consistent and efficient testing.
+
+Endpoints:
+
+PUT /mobile/Generateotp
+PUT /mobile/Getpublickey
+PUT /mobile/validateotp
+Story 2: Automate Testing for Mobile Employee Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile Employee Module API endpoints using C# and SpecFlow to validate the correctness of the responses and error handling.
+
+Endpoints:
+
+GET /mobile/employee/{employeeId}
+GET /mobile/employee/{employeeId}/EmployerSettings
+GET /mobile/employee/{employeeId}/trends
+Story 3: Automate Testing for Mobile Employee PAYE Form Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile Employee PAYE Form Module API endpoints using C# and SpecFlow to ensure proper retrieval and updates to PAYE forms.
+
+Endpoints:
+
+GET /mobile/employee/{employeeId}/PayeForm
+GET /mobile/employee/{employeeId}/payeform/{payeformId}
+PUT /mobile/employee/{employeeId}/Payeform/{payeformId}/setasread
+Story 4: Automate Testing for Mobile Employee Payslip Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile Employee Payslip Module API endpoints using C# and SpecFlow to ensure the payslips are being retrieved correctly and the latest payslip endpoint is functioning properly.
+
+Endpoints:
+
+GET /mobile/employee/{employeeId}/Payslips
+GET /mobile/employee/{employeeId}/Payslip/latest
+GET /mobile/employee/{employeeId}/Payslip/{PayslipId}
+GET /mobile/employee/{employeeId}/Payslip/{PayslipId}/download
+Story 5: Automate Testing for Mobile Employee Payslip Summaries and Diff API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile Employee Payslip summaries and diff API endpoints using C# and SpecFlow to ensure the endpoints are providing accurate and up-to-date data.
+
+Endpoints:
+
+GET /mobile/employee/{employeeId}/payslipsummaries
+GET /mobile/employee/{employeeId}/Payslips/{previouspayslip}
+Story 6: Automate Testing for Mobile User Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile User Module API endpoints using C# and SpecFlow to ensure consistent and efficient testing.
+
+Endpoints:
+
+GET /mobile/user/{userid}
+PUT /mobile/user/{userid}
+PUT /mobile/user/{userid}/Lite
+PUT /mobile/user/{userid}/SetPin
+Story 7: Automate Testing for Mobile User Address Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile User Address Module API endpoints using C# and SpecFlow to validate the correctness of the responses and error handling.
+
+Endpoints:
+
+GET /mobile/user/{userid}/Address
+POST /mobile/user/{userid}/Address
+POST /mobile/user/{userid}/Addresses
+GET /mobile/user/{userid}/Address/{addressid}
+PUT /mobile/user/{userid}/Address/{addressid}
+
+
+Story 8: Automate Testing for Mobile User Credit Score Module API Endpoints
+
+Description:
+
+As a Quality Assurance Engineer, I need to automate tests for the Mobile User Credit Score Module API endpoints using C# and SpecFlow to ensure accuracy and consistency of credit score retrieval and updates.
+
+Endpoints:
+
+GET /mobile/user/{userid}/CreditScore
+POST /mobile/user/{userid}/CreditScore/Consent
+PUT /mobile/user/{userid}/CreditScore/{CreditScoreid}
+
+For each of these stories, acceptance criteria would be something like:
+Acceptance Criteria:
+Setup appropriate staging data for each endpoint that reflects various application states and scenarios (success, validation errors, server errors, edge cases).
+
+Implement automated tests for the API endpoints using C# and SpecFlow.
+
+Create SpecFlow features and scenarios for each API endpoint.
+
+Scenarios should cover all expected outcomes (success, validation errors, server errors) and any specific business rules.
+
+Define step definitions for each step in the scenarios. These should call the appropriate API function and perform assertions to validate the response.
+
+Execute the automated tests to identify any issues and ensure the correctness of each endpoint.
+
+Validate the correctness of the data retrieved by comparing it with the expected results.
+
+Ensure the tests run successfully in the local environment and also against the staging data.
+
+Include these tests in the continuous integration pipeline to be run on every build.
