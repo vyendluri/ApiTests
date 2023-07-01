@@ -1,0 +1,611 @@
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class LoginPage
+    {
+        private IWebDriver _driver;
+
+        public LoginPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.Name, Using = "email")]
+        public IWebElement EmailInput { get; set; }
+
+        [FindsBy(How = How.Name, Using = "password")]
+        public IWebElement PasswordInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "login-button")]
+        public IWebElement SignInButton { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/forgot-password']")]
+        public IWebElement ForgottenPasswordLink { get; set; }
+
+        public void Login(string email, string password)
+        {
+            EmailInput.SendKeys(email);
+            PasswordInput.SendKeys(password);
+            SignInButton.Click();
+        }
+
+        public void ForgotPassword()
+        {
+            ForgottenPasswordLink.Click();
+        }
+    }
+}
+
+//////////////////////
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class ChooseAccountPage
+    {
+        private IWebDriver _driver;
+
+        public ChooseAccountPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.CssSelector, Using = "#errorMessageControl .alert-danger")]
+        public IWebElement ErrorMessage { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(text(), 'System Admin')]")]
+        public IWebElement SystemAdminButton { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(text(), 'Agent')]")]
+        public IWebElement AgentButton { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(text(), 'Employer')]")]
+        public IWebElement EmployerButton { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(text(), 'Employee')]")]
+        public IWebElement EmployeeButton { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = ".navbar-right .dropdown-toggle")]
+        public IWebElement Dropdown { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = ".dropdown-menu a[href='/logout']")]
+        public IWebElement LogoutLink { get; set; }
+
+        public bool IsAtChooseAccountPage()
+        {
+            return _driver.Title.Contains("PayDashboard - Choose Account");
+        }
+
+        public void SelectAccount(string role)
+        {
+            if (role == "System Admin")
+                SystemAdminButton.Click();
+            else if (role == "Agent")
+                AgentButton.Click();
+            else if (role == "Employer")
+                EmployerButton.Click();
+            else if (role == "Employee")
+                EmployeeButton.Click();
+        }
+
+        public void Logout()
+        {
+            Dropdown.Click();
+            LogoutLink.Click();
+        }
+    }
+}
+
+/////
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployerNavbar
+    {
+        private IWebDriver _driver;
+
+        public EmployerNavbar(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.LinkText, Using = "Dashboard")]
+        public IWebElement DashboardLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Perkwell")]
+        public IWebElement PerkwellLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "My Account")]
+        public IWebElement MyAccountLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Switch Account")]
+        public IWebElement SwitchAccountLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Logout")]
+        public IWebElement LogoutLink { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//a[text()='Documents']")]
+        public IWebElement DocumentsDropdown { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//a[text()='Manage']")]
+        public IWebElement ManageDropdown { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "button.dropdown-toggle")]
+        public IWebElement UserDropdown { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//a[contains(@href, 'documents/employer')]")]
+        public IWebElement CompanyDocumentLink { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//a[contains(@href, 'documents/employee/employer')]")]
+        public IWebElement EmployeeDocumentLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Settings")]
+        public IWebElement SettingsLink { get; set; }
+
+        // Other elements...
+
+        public void GoToDashboard()
+        {
+            DashboardLink.Click();
+        }
+
+        public void GoToPerkwell()
+        {
+            PerkwellLink.Click();
+        }
+
+        public void Logout()
+        {
+            UserDropdown.Click();
+            LogoutLink.Click();
+        }
+
+        // Other methods...
+    }
+}
+
+//////////
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployerSettingsPage
+    {
+        private IWebDriver _driver;
+
+        public EmployerSettingsPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.LinkText, Using = "Edit Options")]
+        public IWebElement EditOptionsButton { get; set; }
+
+        public void EditOptions()
+        {
+            EditOptionsButton.Click();
+        }
+    }
+}
+
+///
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployerOptionsPage
+    {
+        private IWebDriver _driver;
+
+        public EmployerOptionsPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.Id, Using = "DefaultPage_Dashboard")]
+        public IWebElement DefaultPageDashboard { get; set; }
+
+        [FindsBy(How = How.Id, Using = "DefaultPage_Documents")]
+        public IWebElement DefaultPageDocuments { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeProfileUpdate_Allowed")]
+        public IWebElement EmployeeProfileUpdateAllowed { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeProfileUpdate_NotAllowed")]
+        public IWebElement EmployeeProfileUpdateNotAllowed { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeProfileUpdate_Custom")]
+        public IWebElement EmployeeProfileUpdateCustom { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//button[@type='submit']")]
+        public IWebElement SaveChangesButton { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Cancel")]
+        public IWebElement CancelButton { get; set; }
+
+        // Add more elements as needed...
+
+        public void SelectDefaultPageDashboard()
+        {
+            DefaultPageDashboard.Click();
+        }
+
+        public void SelectDefaultPageDocuments()
+        {
+            DefaultPageDocuments.Click();
+        }
+
+        public void SelectEmployeeProfileUpdateAllowed()
+        {
+            EmployeeProfileUpdateAllowed.Click();
+        }
+
+        public void SelectEmployeeProfileUpdateNotAllowed()
+        {
+            EmployeeProfileUpdateNotAllowed.Click();
+        }
+
+        public void SelectEmployeeProfileUpdateCustom()
+        {
+            EmployeeProfileUpdateCustom.Click();
+        }
+
+        public void SaveChanges()
+        {
+            SaveChangesButton.Click();
+        }
+
+        public void Cancel()
+        {
+            CancelButton.Click();
+        }
+
+        // Add more actions as needed...
+    }
+}
+
+
+
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployerDashboardPage
+    {
+        private IWebDriver _driver;
+
+        public EmployerDashboardPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.XPath, Using = "//li[@data-tab-name='Dashboard']/a")]
+        public IWebElement DashboardTab { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//li[@data-tab-name='Analysis']/a")]
+        public IWebElement AnalysisTab { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//li[@data-tab-name='Audit']/a")]
+        public IWebElement AuditTab { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//li[@data-tab-name='Notifications']/a")]
+        public IWebElement NotificationsTab { get; set; }
+
+        [FindsBy(How = How.XPath, Using = "//li[@data-tab-name='Notifications']//span[@class='badge badge-error']")]
+        public IWebElement NotificationsCount { get; set; }
+
+        public void GoToDashboard()
+        {
+            DashboardTab.Click();
+        }
+
+        public void GoToAnalysis()
+        {
+            AnalysisTab.Click();
+        }
+
+        public void GoToAudit()
+        {
+            AuditTab.Click();
+        }
+
+        public void GoToNotifications()
+        {
+            NotificationsTab.Click();
+        }
+    }
+}
+
+///////////////////
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployeeNavbar
+    {
+        private IWebDriver _driver;
+
+        public EmployeeNavbar(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/employee/home']")]
+        public IWebElement Home { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ee-nav-lnk-payslips")]
+        public IWebElement Payslips { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ee-nav-lnk-paye")]
+        public IWebElement P45_P60_P11D { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ee-nav-lnk-documents")]
+        public IWebElement Communications { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/user-content/display/guidance']")]
+        public IWebElement Guidance { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ee-nav-lnk-support")]
+        public IWebElement Support { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/third-party-app/access']")]
+        public IWebElement ThirdPartyAppAccess { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/thirdpartydataprovider/data']")]
+        public IWebElement ThirdPartyData { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/partners/employee/perkwell']")]
+        public IWebElement Perkwell { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/user-content/display/rewards']")]
+        public IWebElement Rewards { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/user-content/display/credit-score']")]
+        public IWebElement CreditScore { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/account']")]
+        public IWebElement MyAccount { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/choose-account']")]
+        public IWebElement SwitchAccount { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/logout']")]
+        public IWebElement Logout { get; set; }
+
+        public void NavigateHome()
+        {
+            Home.Click();
+        }
+
+        public void OpenPayslips()
+        {
+            Payslips.Click();
+        }
+
+        public void OpenP45_P60_P11D()
+        {
+            P45_P60_P11D.Click();
+        }
+
+        public void OpenCommunications()
+        {
+            Communications.Click();
+        }
+
+        public void OpenGuidance()
+        {
+            Guidance.Click();
+        }
+
+        public void OpenSupport()
+        {
+            Support.Click();
+        }
+
+        public void OpenThirdPartyAppAccess()
+        {
+            ThirdPartyAppAccess.Click();
+        }
+
+        public void OpenThirdPartyData()
+        {
+            ThirdPartyData.Click();
+        }
+
+        public void OpenPerkwell()
+        {
+            Perkwell.Click();
+        }
+
+        public void OpenRewards()
+        {
+            Rewards.Click();
+        }
+
+        public void OpenCreditScore()
+        {
+            CreditScore.Click();
+        }
+
+        public void OpenMyAccount()
+        {
+            MyAccount.Click();
+        }
+
+        public void SwitchAccounts()
+        {
+            SwitchAccount.Click();
+        }
+
+        public void Logout()
+        {
+            Logout.Click();
+        }
+    }
+}
+
+////////////////////
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class MyAccountPage
+    {
+        private IWebDriver _driver;
+
+        public MyAccountPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        // elements
+
+        [FindsBy(How = How.Id, Using = "errorMessagePlaceholder")]
+        public IWebElement ErrorMessagePlaceholder { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "My Activity")]
+        public IWebElement MyActivityLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Account Audits")]
+        public IWebElement AccountAuditsLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Contact Employer")]
+        public IWebElement ContactEmployerLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Change Details")]
+        public IWebElement ChangeDetailsLink { get; set; }
+
+        [FindsBy(How = How.Id, Using = "DisplayName")]
+        public IWebElement FullName { get; set; }
+
+        [FindsBy(How = How.Id, Using = "Email")]
+        public IWebElement Email { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Edit Notifications")]
+        public IWebElement EditNotificationsLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Change Password")]
+        public IWebElement ChangePasswordLink { get; set; }
+
+        [FindsBy(How = How.LinkText, Using = "Enable")]
+        public IWebElement EnableTwoFactorAuthLink { get; set; }
+
+        [FindsBy(How = How.Id, Using = "TwoFactorStatus")]
+        public IWebElement TwoFactorStatus { get; set; }
+
+        // methods
+
+        public void OpenMyActivity()
+        {
+            MyActivityLink.Click();
+        }
+
+        public void OpenAccountAudits()
+        {
+            AccountAuditsLink.Click();
+        }
+
+        public void ContactEmployer()
+        {
+            ContactEmployerLink.Click();
+        }
+
+        public void ChangeDetails()
+        {
+            ChangeDetailsLink.Click();
+        }
+
+        public void EditNotifications()
+        {
+            EditNotificationsLink.Click();
+        }
+
+        public void ChangePassword()
+        {
+            ChangePasswordLink.Click();
+        }
+
+        public void EnableTwoFactorAuthentication()
+        {
+            EnableTwoFactorAuthLink.Click();
+        }
+    }
+}
+
+/////////////////////
+
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EditDetailsPage
+    {
+        private IWebDriver _driver;
+
+        public EditDetailsPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.Id, Using = "Title")]
+        public IWebElement TitleInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "FirstName")]
+        public IWebElement FirstNameInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "LastName")]
+        public IWebElement LastNameInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "Salutation")]
+        public IWebElement SalutationInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "Email")]
+        public IWebElement EmailInput { get; set; }
+
+        [FindsBy(How = How.Id, Using = "MobileNumber")]
+        public IWebElement MobileNumberInput { get; set; }
+
+        // Assuming there's an element with id "submit" that serves as a save button
+        [FindsBy(How = How.Id, Using = "submit")]
+        public IWebElement SaveButton { get; set; }
+
+        public void FillDetails(string title, string firstName, string lastName, string salutation, string email, string mobileNumber)
+        {
+            TitleInput.SendKeys(title);
+            FirstNameInput.SendKeys(firstName);
+            LastNameInput.SendKeys(lastName);
+            SalutationInput.SendKeys(salutation);
+            EmailInput.SendKeys(email);
+            MobileNumberInput.SendKeys(mobileNumber);
+
+            SaveButton.Click();
+        }
+    }
+}
+
