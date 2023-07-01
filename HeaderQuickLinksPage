@@ -1,0 +1,48 @@
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class HeaderQuickLinksPage
+    {
+        private IWebDriver _driver;
+
+        public HeaderQuickLinksPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.Id, Using = "ee-home-link-previous")]
+        public IWebElement PreviousPayslipsLink { get; set; }
+
+        [FindsBy(How = How.Id, Using = "ee-home-link-guidance")]
+        public IWebElement GuidanceLink { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/payslip/dashboard']")]
+        public IWebElement TrendsLink { get; set; }
+
+        [FindsBy(How = How.CssSelector, Using = "a[href='/payslips/bulk-download']")]
+        public IWebElement BulkDownloadLink { get; set; }
+
+        public void ClickPreviousPayslipsLink()
+        {
+            PreviousPayslipsLink.Click();
+        }
+
+        public void ClickGuidanceLink()
+        {
+            GuidanceLink.Click();
+        }
+
+        public void ClickTrendsLink()
+        {
+            TrendsLink.Click();
+        }
+
+        public void ClickBulkDownloadLink()
+        {
+            BulkDownloadLink.Click();
+        }
+    }
+}
