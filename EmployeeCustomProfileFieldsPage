@@ -1,0 +1,137 @@
+using OpenQA.Selenium;
+using SeleniumExtras.PageObjects;
+
+namespace YourNamespace
+{
+    public class EmployeeCustomProfileFieldsPage
+    {
+        private IWebDriver _driver;
+
+        public EmployeeCustomProfileFieldsPage(IWebDriver driver)
+        {
+            _driver = driver;
+            PageFactory.InitElements(driver, this);
+        }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_Title")]
+        public IWebElement TitleCheckBox { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_FirstName")]
+        public IWebElement FirstNameCheckBox { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_LastName")]
+        public IWebElement LastNameCheckBox { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_DoB")]
+        public IWebElement DobCheckBox { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_MobilePhone")]
+        public IWebElement MobilePhoneCheckBox { get; set; }
+
+        [FindsBy(How = How.Id, Using = "EmployeeCustomProfileFields_EmailAddress")]
+        public IWebElement EmailAddressCheckBox { get; set; }
+
+        public void ToggleTitleCheckBox()
+        {
+            TitleCheckBox.Click();
+        }
+
+        public void ToggleFirstNameCheckBox()
+        {
+            FirstNameCheckBox.Click();
+        }
+
+        public void ToggleLastNameCheckBox()
+        {
+            LastNameCheckBox.Click();
+        }
+
+        public void ToggleDobCheckBox()
+        {
+            DobCheckBox.Click();
+        }
+
+        public void ToggleMobilePhoneCheckBox()
+        {
+            MobilePhoneCheckBox.Click();
+        }
+
+        public void ToggleEmailAddressCheckBox()
+        {
+            EmailAddressCheckBox.Click();
+        }
+
+        public void UncheckAllCheckboxes()
+            {
+                if (TitleCheckBox.Selected)
+                {
+                    TitleCheckBox.Click();
+                }
+                if (FirstNameCheckBox.Selected)
+                {
+                    FirstNameCheckBox.Click();
+                }
+                if (LastNameCheckBox.Selected)
+                {
+                    LastNameCheckBox.Click();
+                }
+                if (DobCheckBox.Selected)
+                {
+                    DobCheckBox.Click();
+                }
+                if (MobilePhoneCheckBox.Selected)
+                {
+                    MobilePhoneCheckBox.Click();
+                }
+                if (EmailAddressCheckBox.Selected)
+                {
+                    EmailAddressCheckBox.Click();
+                }
+            }
+
+        public void CheckNecessaryCheckboxes()
+        {
+            // Assuming that 'Title', 'FirstName' and 'MobilePhone' are necessary
+            if (!TitleCheckBox.Selected)
+            {
+                TitleCheckBox.Click();
+            }
+            if (!FirstNameCheckBox.Selected)
+            {
+                FirstNameCheckBox.Click();
+            }
+            if (!MobilePhoneCheckBox.Selected)
+            {
+                MobilePhoneCheckBox.Click();
+            }
+        }
+
+        public void CheckNecessaryCheckboxes(List<string> checkboxIds)
+        {
+            var checkboxMap = new Dictionary<string, IWebElement>
+            {
+                {"EmployeeCustomProfileFields_Title", TitleCheckBox},
+                {"EmployeeCustomProfileFields_FirstName", FirstNameCheckBox},
+                {"EmployeeCustomProfileFields_LastName", LastNameCheckBox},
+                {"EmployeeCustomProfileFields_DoB", DobCheckBox},
+                {"EmployeeCustomProfileFields_MobilePhone", MobilePhoneCheckBox},
+                {"EmployeeCustomProfileFields_EmailAddress", EmailAddressCheckBox}
+            };
+
+            // Iterate over each ID in the list
+            foreach (string id in checkboxIds)
+            {
+                // If the ID is in the dictionary, check the checkbox
+                if (checkboxMap.ContainsKey(id) && !checkboxMap[id].Selected)
+                {
+                    checkboxMap[id].Click();
+                }
+            }
+        }
+
+    }
+}
+
+
+
+
