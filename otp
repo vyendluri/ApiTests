@@ -1,3 +1,65 @@
+using System;
+using System.Linq;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapGet("/GetOTP", (string secret) =>
+{
+    long iteration = GetIteration();
+    return GeneratePassword(secret, iteration);
+});
+
+app.Run();
+
+long GetIteration()
+{
+    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    return (long)(DateTime.UtcNow - unixEpoch).TotalSeconds / 30;
+}
+
+string GeneratePassword(string secret, long iteration)
+{
+    var counter = BitConverter.GetBytes(iteration);
+
+    if (BitConverter.IsLittleEndian)
+        Array.Reverse(counter);
+
+    var hmac = new HMACSHA1(SecretToBytes(secret));
+    var hash = hmac.ComputeHash(counter);
+    var offset = hash[hash.Length - 1] & 0xf;
+    var binary = ((hash[offset] & 0x7f) << 24)
+                 | ((hash[offset + 1] & 0xff) << 16)
+                 | ((hash[offset + 2] & 0xff) << 8)
+                 | (hash[offset + 3] & 0xff);
+
+    var password = binary % 1000000;
+    return password.ToString("D6");
+}
+
+byte[] SecretToBytes(string secret)
+{
+    const string Base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    var bits = secret.ToUpper().ToCharArray().Select(c =>
+        Convert.ToString(Base32Alphabet.IndexOf(c), 2).PadLeft(5, '0')).Aggregate((a, b) => a + b);
+    return Enumerable.Range(0, bits.Length / 8).Select(i => Convert.ToByte(bits.Substring(i * 8, 8), 2)).ToArray();
+}
+
+
+---------------------------------------------
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.time.Instant
