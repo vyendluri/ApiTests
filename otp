@@ -1,0 +1,46 @@
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
+class TwoFactorAuthenticationService {
+    static final ZonedDateTime UNIX_EPOCH = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("UTC"))
+    static final String BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+
+    static String generatePassword() {
+        String secret = "S0"
+        long iteration = (ZonedDateTime.now(ZoneId.of("UTC")).toInstant().toEpochMilli() - UNIX_EPOCH.toInstant().toEpochMilli()) / 1000 / 30
+        byte[] counter = ByteBuffer.allocate(Long.BYTES).putLong(iteration).array()
+        counter = counter.reverse()
+
+        byte[] secretBytes = secretToBytes(secret)
+        Mac hmac = Mac.getInstance("HmacSHA1")
+        hmac.init(new SecretKeySpec(secretBytes, "HmacSHA1"))
+        byte[] hash = hmac.doFinal(counter)
+
+        int offset = hash[hash.length - 1] & 0x0f
+        int binary = ((hash[offset] & 0x7f) << 24) |
+                     ((hash[offset + 1] & 0xff) << 16) |
+                     ((hash[offset + 2] & 0xff) << 8) |
+                     (hash[offset + 3] & 0xff)
+
+        int password = binary % 1000000
+        return password.toString().padLeft(6, '0')
+    }
+
+    static byte[] secretToBytes(String secret) {
+        def bits = secret.toUpperCase().collect { char ->
+            BASE32_ALPHABET.indexOf(char).toString(2).padLeft(5, '0')
+        }.join()
+        def bytes = []
+        bits.toList().collate(8).each { byteString ->
+            bytes << Integer.parseInt(byteString.join(''), 2) as byte
+        }
+        return bytes
+    }
+}
+
+// Usage example
+def tfas = new TwoFactorAuthenticationService()
+println tfas.generatePassword()
